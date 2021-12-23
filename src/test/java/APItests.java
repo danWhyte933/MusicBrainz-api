@@ -1,27 +1,25 @@
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.testng.Assert;
+import org.apache.commons.lang3.StringUtils;
 import org.testng.annotations.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
 public class APItests {
 
     @Test
-    void test1() {
+    void test1() throws UnirestException {
 
         Response responder = RestAssured.get("http://musicbrainz.org/ws/2/release/?query=Metallica&limit=100&fmt&inc=work=xml");
 
@@ -57,13 +55,18 @@ public class APItests {
 
 
 
-        Response responderTwo = RestAssured.get("https://private-anon-1f438acdaa-lyricsovh.apiary-proxy.com/v1/Nirvana/Smells%20like%20teen%20spirit");
-        String lyricResponse = responderTwo.asString();
-        System.out.println("Lyric Status code : " + responderTwo.getStatusCode());
-        System.out.println("Lyric Body : " + responderTwo.getBody());
-        System.out.println("Lyric Time taken : " + responderTwo.getTime());
-        System.out.println("Lyric Header : " + responderTwo.getHeader("content-type"));
-        System.out.println(lyricResponse); // no lyrics found, gets 404 error
+        Unirest.setTimeouts(0, 0);
+        HttpResponse<String> response = Unirest.get("https://private-anon-1f438acdaa-lyricsovh.apiary-proxy.com/v1/Coldplay/Adventure%20of%20a%20Lifetime")
+                .asString();
+
+        String firstResponse = response.getBody();
+        System.out.println("first response body " + firstResponse);
+        String secondResponse = firstResponse.replaceAll("\n",", ");
+        String thirdResponse = StringUtils.replaceChars(firstResponse, '\n', ' ');
+        System.out.println("second response body " + secondResponse);
+        System.out.println("third response body " + thirdResponse);
+        // need to replace \n with a space, replaceAll and replace do not work
+
 
     }
     private String getDocumentElementText(Document doc, String elementName) {
