@@ -53,10 +53,16 @@ public class APItests {
         songs = new ArrayList<String>(new LinkedHashSet<String>(songs));
         System.out.println("Without duplicates " + songs);
 
-
+        String artistEntry = "Amy Winehouse";
+        String songEntry = "Back to black";
+        String spacedArtist = artistEntry.replaceAll(" ", "%20");
+        String spacedSong = songEntry.replaceAll(" ", "%20");
+        String lyricRequest = "https://private-anon-1f438acdaa-lyricsovh.apiary-proxy.com/v1/" + spacedArtist + "/" + spacedSong;
+        System.out.println("lyric request " + lyricRequest);
+        // adds and relevant % sign to artists and songs
 
         Unirest.setTimeouts(0, 0);
-        HttpResponse<String> response = Unirest.get("https://private-anon-1f438acdaa-lyricsovh.apiary-proxy.com/v1/Coldplay/Adventure%20of%20a%20Lifetime")
+        HttpResponse<String> response = Unirest.get(lyricRequest)
                 .asString();
 
         String firstResponse = response.getBody();
@@ -65,8 +71,10 @@ public class APItests {
         String thirdResponse = StringUtils.replaceChars(firstResponse, '\n', ' ');
         System.out.println("second response body " + secondResponse);
         System.out.println("third response body " + thirdResponse);
-        // need to replace \n with a space, replaceAll and replace do not work
-
+        // need to replace \n with a space, replaceAll and replace do not work, neither does REGEX
+        String[] words = firstResponse.split("\\s+");
+        System.out.println("Number of words " + words.length);
+        // successfully counts the words but with \n not separating some
 
     }
     private String getDocumentElementText(Document doc, String elementName) {
